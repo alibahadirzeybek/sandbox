@@ -6,7 +6,7 @@ vvp:
   blobStorage:
     baseUri: s3://vvp
     s3:
-      endpoint: http://minio.vvp.svc:9000
+      endpoint: http://minio.minio.svc:9000
 
 blobStorageCredentials:
   s3:
