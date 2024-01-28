@@ -1,0 +1,32 @@
+---
+vvp:
+  persistence:
+    type: local
+
+  blobStorage:
+    baseUri: s3://vvp
+    s3:
+      endpoint: http://minio.vvp.svc:9000
+
+blobStorageCredentials:
+  s3:
+    accessKeyId: admin
+    secretAccessKey: password
+
+rbac:
+  additionalNamespaces:
+    - vvp-jobs
+
+ui:
+  image:
+    pullPolicy: IfNotPresent
+
+appmanager:
+  image:
+    pullPolicy: IfNotPresent
+
+gateway:
+  image:
+    pullPolicy: IfNotPresent
+
+acceptCommunityEditionLicense: true
