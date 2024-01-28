@@ -1,6 +1,6 @@
 resource "kubectl_manifest" "manifests" {
-    for_each        = toset(local.kubernetes_manifests)
-    yaml_body       = file("${path.module}/manifests/${each.value}/values.yaml")
+    for_each        = fileset(path.root, "${path.module}/manifests/*/*.yaml")
+    yaml_body       = file(each.value)
 }
 
 resource "helm_release" "releases" {

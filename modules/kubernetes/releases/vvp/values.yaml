@@ -1,12 +1,17 @@
 ---
 vvp:
+
   persistence:
-    type: local
+    type: jdbc
+    datasource:
+      url: jdbc:mariadb://mysql.mysql.svc:3306/vvp
+      username: root
+      password: password
 
   blobStorage:
     baseUri: s3://vvp
     s3:
-      endpoint: http://minio.vvp.svc:9000
+      endpoint: http://minio.minio.svc:9000
 
 blobStorageCredentials:
   s3:
