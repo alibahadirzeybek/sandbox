@@ -1,0 +1,13 @@
+catalog:
+  type: paimon
+  packaged: true
+  readOnly: false
+  properties:
+    - key: type
+      required: true
+    - key: warehouse
+      required: true
+    - key: s3.access-key
+      required: true
+    - key: s3.secret-key
+      required: true

@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+  namespace: mysql
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS events;
+    USE events;
+    CREATE TABLE login (user_name VARCHAR(255), login_time TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3), PRIMARY KEY (user_name, login_time));
+    INSERT INTO login (user_name) VALUES ('john_doe'), ('jane_doe'); 

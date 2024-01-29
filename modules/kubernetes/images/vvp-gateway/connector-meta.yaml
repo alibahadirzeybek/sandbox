@@ -1,0 +1,21 @@
+connector:
+  type: mysql-cdc
+  packaged: true
+  source: true
+  sink: false
+  lookup: false
+  properties:
+    - key: connector
+      required: true
+    - key: hostname
+      required: true
+    - key: port
+      required: true
+    - key: username
+      required: true
+    - key: password
+      required: true
+    - key: database-name
+      required: true
+    - key: table-name
+      required: true
