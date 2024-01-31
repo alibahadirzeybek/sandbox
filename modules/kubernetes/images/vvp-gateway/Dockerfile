@@ -1,5 +1,7 @@
 FROM alpine/curl:3.14 AS dependency-downloader
 
+RUN curl -o /tmp/mysql-connector-java-5.1.49.jar https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar
+
 RUN curl -o /tmp/flink-sql-connector-mysql-cdc-3.0.0.jar https://repo1.maven.org/maven2/com/ververica/flink-sql-connector-mysql-cdc/3.0.0/flink-sql-connector-mysql-cdc-3.0.0.jar
 RUN curl -o /tmp/flink-connector-base-1.18.0.jar https://repo1.maven.org/maven2/org/apache/flink/flink-connector-base/1.18.0/flink-connector-base-1.18.0.jar
 
@@ -10,6 +12,8 @@ RUN curl -o /tmp/paimon-s3-0.6.0-incubating.jar https://repo.maven.apache.org/ma
 # ----
 
 FROM registry.ververica.com/v2.12/vvp-gateway:2.12.0
+
+COPY --from=dependency-downloader /tmp/mysql-connector-java-5.1.49.jar /vvp/sql/opt/connectors/jdbc/mysql-connector-java-5.1.49.jar
 
 COPY connector-meta.yaml /vvp/sql/opt/connectors/mysql-cdc/connector-meta.yaml
 

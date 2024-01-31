@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
-  namespace: mysql
+  name: kibana
+  namespace: kibana
 spec:
   ports:
-    - port: 3306
+    - port: 5601
   selector:
-    app: mysql
+    app: kibana
