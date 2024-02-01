@@ -9,3 +9,7 @@ output "access_key" {
 output "secret_key" {
   value = module.iam.secret_key
 }
+
+output "cluster_ip" {
+  value = module.emr.cluster_ip
+}

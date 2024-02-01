@@ -1,3 +1,3 @@
 locals {
-    unique_name = "vvp"
+    unique_name = "vvp-hive-catalog"
 }

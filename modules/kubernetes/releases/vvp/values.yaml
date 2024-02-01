@@ -1,6 +1,5 @@
 ---
 vvp:
-
   persistence:
     type: local
 
@@ -20,5 +19,18 @@ gateway:
   image:
     pullPolicy: IfNotPresent
     repository: local.ververica.registry/v2.12/vvp-gateway
+
+env:
+  - name: JAVA_TOOL_OPTIONS
+    value: "--add-opens=java.base/java.net=ALL-UNNAMED"
+
+volumeMounts:
+  - name: hive-site
+    mountPath: /etc/hive
+
+volumes:
+  - name: hive-site
+    configMap:
+      name: hive-metastore
 
 acceptCommunityEditionLicense: true

@@ -12,7 +12,14 @@ resource "docker_image" "images" {
 
 resource "kubectl_manifest" "manifests" {
     for_each        = fileset(path.root, "${path.module}/manifests/*/*.yaml")
-    yaml_body       = file(each.value)
+    yaml_body       = templatefile(
+        each.value,
+        {
+            access_key = var.access_key
+            secret_key = var.secret_key
+            cluster_ip = var.cluster_ip
+        }
+    )
     depends_on      = [docker_image.images]
 }
 

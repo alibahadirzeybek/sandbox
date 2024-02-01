@@ -9,8 +9,8 @@ able to use the custom image since it does not push the image to any remote repo
 ## Required Permissions on AWS
 
 If you would like to use a different name for AWS resourcesother than `vvp`,
-you can change the `unique_name` under `modules/aws/locals.tf` which will 
-change the naming for S3 bucket, IAM user and IAM policy.
+you can change the `unique_name` under `modules/aws/locals.tf` which will
+change the naming for S3 bucket, IAM user, IAM policy, etc.
 
 Please then change the resource ARN's accordingly in the following statement
 or directly apply this for the user of terminal that is running the terraform.
@@ -23,16 +23,57 @@ Do not forget to change the `<ACCOUNT_ID>` of the AWS account that will be used.
 		{
 			"Sid": "VisualEditor0",
 			"Effect": "Allow",
-			"Action": "s3:*",
-			"Resource": "arn:aws:s3:::vvp"
+			"Action": [
+				"ec2:DescribeInternetGateways",
+				"ec2:DescribeSecurityGroupRules",
+				"ec2:DescribeNetworkInterfaces",
+				"ec2:DescribeVpcs",
+				"elasticmapreduce:*",
+				"ec2:DescribeSubnets",
+				"ec2:DescribeKeyPairs",
+				"ec2:DescribeRouteTables",
+				"ec2:DescribeSecurityGroups"
+			],
+			"Resource": "*"
 		},
 		{
 			"Sid": "VisualEditor1",
 			"Effect": "Allow",
+			"Action": "iam:PassRole",
+			"Resource": [
+				"arn:aws:iam::<ACCOUNT_ID>:role/EMR_DefaultRole",
+				"arn:aws:iam::<ACCOUNT_ID>:role/EMR_EC2_DefaultRole"
+			]
+		},
+		{
+			"Sid": "VisualEditor2",
+			"Effect": "Allow",
+			"Action": "ec2:*",
+			"Resource": [
+				"arn:aws:ec2:us-west-1:<ACCOUNT_ID>:security-group/*",
+				"arn:aws:ec2:us-west-1:<ACCOUNT_ID>:internet-gateway/*",
+				"arn:aws:ec2:us-west-1:<ACCOUNT_ID>:vpc/*",
+				"arn:aws:ec2:us-west-1:<ACCOUNT_ID>:route-table/*",
+				"arn:aws:ec2:us-west-1:<ACCOUNT_ID>:key-pair/vvp-hive-catalog",
+				"arn:aws:ec2:us-west-1:<ACCOUNT_ID>:subnet/*"
+			]
+		},
+		{
+			"Sid": "VisualEditor3",
+			"Effect": "Allow",
+			"Action": "s3:*",
+			"Resource": [
+				"arn:aws:s3:::vvp-hive-catalog/*",
+				"arn:aws:s3:::vvp-hive-catalog"
+			]
+		},
+		{
+			"Sid": "VisualEditor4",
+			"Effect": "Allow",
 			"Action": "iam:*",
 			"Resource": [
-				"arn:aws:iam::<ACCOUNT_ID>:user/vvp",
-				"arn:aws:iam::<ACCOUNT_ID>:policy/vvp"
+				"arn:aws:iam::<ACCOUNT_ID>:policy/vvp-hive-catalog",
+				"arn:aws:iam::<ACCOUNT_ID>:user/vvp-hive-catalog"
 			]
 		}
 	]
@@ -46,13 +87,14 @@ Creating the resources
 
 `terraform apply`
 
-Outputting the '<ACCESS_KEY>' and '<SECRET_KEY>'
+Outputting the '<CLUSTER_IP>' and '<BUCKET_NAME>'
 
 `terraform output -json`
 
 Destroy the resources
 
-`terraform destroy` 
+`terraform destroy`
+
 
 
 ## Port Forwarding
@@ -61,158 +103,36 @@ VVP
 
 `kubectl port-forward --namespace=vvp services/vvp-ververica-platform 8080:80`
 
-Kibana
 
-`kubectl port-forward --namespace=kibana services/kibana 5601:5601`
-
-
-## SQL Scripts
+## Hive Setup
 
 ```
-CREATE TABLE login_events (
-    user_name STRING NOT NULL,
-    login_time TIMESTAMP(3)
-)
+chmod 400 vvp-hive-catalog.pem
+```
+
+```
+ssh -i ./vvp-hive-catalog.pem hadoop@<CLUSTER_IP>
+```
+
+```
+hive
+```
+
+
+```
+CREATE EXTERNAL TABLE event (name STRING) 
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe'
+WITH SERDEPROPERTIES ('avro.schema.url'='s3a://vvp-hive-catalog/schema/schema.avsc')
+STORED AS AVRO LOCATION 's3a://vvp-hive-catalog/data/';
+```
+
+
+## Catalog Setup
+```
+CREATE CATALOG hive
 WITH (
-    'connector'     = 'jdbc',
-    'url'           = 'jdbc:mysql://mysql.mysql.svc:3306/events',
-    'username'      = 'root',
-    'password'      = 'password',
-    'table-name'    = 'login'
+  'type' = 'hive',
+  'hive-version' = '3.1.3',
+  'hive-conf-dir' = '/etc/hive'
 );
-```
-
-
-```
-INSERT INTO login_events (user_name)
-VALUES ('john_doe');
-```
-
-
-```
-SELECT *
-FROM login_events;
-```
-
-
-```
-CREATE TABLE login_events_binlog (
-    user_name STRING NOT NULL,
-    login_time TIMESTAMP(3) NOT NULL,
-    PRIMARY KEY(user_name, login_time) NOT ENFORCED
-) WITH (
-    'connector'     = 'mysql-cdc',
-    'hostname'      = 'mysql.mysql.svc',
-    'port'          = '3306',
-    'username'      = 'root',
-    'password'      = 'password',
-    'database-name' = 'events',
-    'table-name'    = 'login'
-);
-```
-
-
-```
-CREATE CATALOG streamhouse WITH (
-    'type'          = 'paimon',
-    'warehouse'     = 's3://vvp/warehouse',
-    's3.access-key' = '<ACCESS_KEY>',
-    's3.secret-key' = '<SECRET_KEY>'
-);
-```
-
-
-```
-USE CATALOG streamhouse;
-CREATE DATABASE events;
-```
-
-
-```
-USE CATALOG streamhouse;
-USE events;
-CREATE TABLE login (
-    user_name STRING NOT NULL,
-    login_time TIMESTAMP(3) NOT NULL,
-    PRIMARY KEY (user_name, login_time) NOT ENFORCED
-);
-```
-
-
-```
-INSERT INTO streamhouse.events.login
-SELECT * FROM login_events_binlog;
-```
-
-
-```
-CREATE VIEW login_events_year_month AS (
-    SELECT
-        user_name,
-        CONCAT(
-            CAST(YEAR(login_time) AS STRING),
-            '_',
-            CAST(MONTH(login_time) AS STRING)
-        ) AS yyyy_mm
-    FROM streamhouse.events.login
-);
-```
-
-
-```
-CREATE TABLE login_events_count_per_month (
-   user_name STRING,
-   yyyy_mm STRING,
-   login_count BIGINT,
-   PRIMARY KEY (user_name, yyyy_mm) NOT ENFORCED
-) WITH (
-    'connector'     = 'elasticsearch-7',
-    'hosts'         = 'http://elasticsearch.elasticsearch.svc:9200',
-    'index'         = 'login_events_count_per_month'
-);
-```
-
-
-```
-INSERT INTO login_events_count_per_month
-SELECT
-    user_name,
-    yyyy_mm,
-    COUNT(*) AS login_count
-FROM login_events_year_month
-GROUP BY user_name, yyyy_mm;
-```
-
-
-```
-CREATE TABLE login_events_top_user_per_month (
-   user_name STRING,
-   yyyy_mm STRING,
-   PRIMARY KEY (yyyy_mm) NOT ENFORCED
-) WITH (
-    'connector'     = 'elasticsearch-7',
-    'hosts'         = 'http://elasticsearch.elasticsearch.svc:9200',
-    'index'         = 'login_events_top_user_per_month'
-);
-```
-
-
-```
-INSERT INTO login_events_top_user_per_month
-SELECT user_name, yyyy_mm
-FROM (
-    SELECT
-        user_name,
-        yyyy_mm,
-        ROW_NUMBER() OVER (PARTITION BY yyyy_mm ORDER BY login_count DESC) AS row_num
-    FROM (
-        SELECT
-            user_name,
-            yyyy_mm,
-            COUNT(*) AS login_count
-        FROM login_events_year_month
-        GROUP BY user_name, yyyy_mm
-    )
-)
-WHERE row_num = 1;
 ```

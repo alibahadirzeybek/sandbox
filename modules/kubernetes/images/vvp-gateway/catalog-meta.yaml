@@ -1,13 +1,17 @@
 catalog:
-  type: paimon
+  type: hive
   packaged: true
-  readOnly: false
+  readOnly: true
   properties:
     - key: type
       required: true
-    - key: warehouse
-      required: true
-    - key: s3.access-key
-      required: true
-    - key: s3.secret-key
-      required: true
+    - key: default-database
+      required: false
+    - key: property-version
+      required: false
+    - key: hive-conf-dir
+      required: false
+    - key: hive-version
+      required: false
+    - key: hadoop-conf-dir
+      required: false
