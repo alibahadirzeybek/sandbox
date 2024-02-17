@@ -23,7 +23,9 @@ module "vpc" {
 module "emr" {
     source              = "./emr"
     name                = local.unique_name
-    key_name            = module.ssh.key_name
     subnet_id           = module.vpc.subnet_id
     security_group_id   = module.vpc.security_group_id
+    key_name            = module.ssh.key_name
+    private_key_pem     = module.ssh.private_key_pem
+    bucket_name         = module.s3.bucket_name 
 }

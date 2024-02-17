@@ -104,29 +104,6 @@ VVP
 `kubectl port-forward --namespace=vvp services/vvp-ververica-platform 8080:80`
 
 
-## Hive Setup
-
-```
-chmod 400 vvp-hive-catalog.pem
-```
-
-```
-ssh -i ./vvp-hive-catalog.pem hadoop@<CLUSTER_IP>
-```
-
-```
-hive
-```
-
-
-```
-CREATE EXTERNAL TABLE event (name STRING) 
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe'
-WITH SERDEPROPERTIES ('avro.schema.url'='s3a://vvp-hive-catalog/schema/schema.avsc')
-STORED AS AVRO LOCATION 's3a://vvp-hive-catalog/data/';
-```
-
-
 ## Catalog Setup
 ```
 CREATE CATALOG hive

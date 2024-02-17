@@ -1,9 +1,9 @@
 {
   "type": "record",
-  "name": "Event",
+  "name": "Events",
   "fields": [
     {
-      "name": "name",
+      "name": "user_name",
       "type": "string"
     }
   ]

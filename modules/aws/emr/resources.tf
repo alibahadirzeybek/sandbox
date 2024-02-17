@@ -21,4 +21,17 @@ resource "aws_emr_cluster" "vvp" {
   }
 
   service_role                          = "EMR_DefaultRole"
+
+  connection {
+    type                                = "ssh"
+    user                                = "hadoop"
+    host                                = self.master_public_dns
+    private_key                         = var.private_key_pem
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "hive -e \"CREATE EXTERNAL TABLE events (user_name STRING) ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe' WITH SERDEPROPERTIES ('avro.schema.url' = 's3a://${var.bucket_name}/schema/schema.avsc') STORED AS AVRO;\""
+    ]
+  }
 }

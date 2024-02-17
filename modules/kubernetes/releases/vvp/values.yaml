@@ -12,10 +12,34 @@ ui:
     pullPolicy: IfNotPresent
 
 appmanager:
+  livenessProbe:
+    httpGet:
+      path: /actuator/health
+      port: management
+    timeoutSeconds: 180
+    initialDelaySeconds: 180
+  readinessProbe:
+    httpGet:
+         path: /actuator/health
+         port: management
+    timeoutSeconds: 180
+    initialDelaySeconds: 180
   image:
     pullPolicy: IfNotPresent
 
 gateway:
+  livenessProbe:
+    httpGet:
+      path: /actuator/health
+      port: management
+    timeoutSeconds: 180
+    initialDelaySeconds: 180
+  readinessProbe:
+    httpGet:
+         path: /actuator/health
+         port: management
+    timeoutSeconds: 180
+    initialDelaySeconds: 180
   image:
     pullPolicy: IfNotPresent
     repository: local.ververica.registry/v2.12/vvp-gateway
@@ -32,5 +56,9 @@ volumes:
   - name: hive-site
     configMap:
       name: hive-metastore
+
+topLevelConfig: 
+  logging.level.com.dataartisans: DEBUG
+  logging.level.com.ververica: DEBUG
 
 acceptCommunityEditionLicense: true
