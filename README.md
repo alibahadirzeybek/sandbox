@@ -1,6 +1,6 @@
 # Sandbox
 
-The project uses terraform to build a custom image, deploy required kubernetes
+The project uses terraform to deploy EMR on AWS, build a custom image, deploy required kubernetes
 manifests and deploy helm releases on the currently configured kubernetes cluster
 at the kubectl. The local kubernetes provider, i.e. minikube, is suggested to be
 able to use the custom image since it does not push the image to any remote repository.
