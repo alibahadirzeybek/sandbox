@@ -1,5 +1,6 @@
 ---
 vvp:
+
   persistence:
     type: local
 
@@ -56,9 +57,5 @@ volumes:
   - name: hive-site
     configMap:
       name: hive-metastore
-
-topLevelConfig: 
-  logging.level.com.dataartisans: DEBUG
-  logging.level.com.ververica: DEBUG
 
 acceptCommunityEditionLicense: true

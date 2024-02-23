@@ -5,7 +5,7 @@ locals {
             namespace       = "vvp"
             repository      = "https://charts.ververica.com"
             chart           = "ververica-platform"
-            version         = "5.8.0"
+            version         = "5.8.1"
             values          = flatten([
                 {
                     name    = "vvp.blobStorage.baseUri"

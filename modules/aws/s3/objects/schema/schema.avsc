@@ -5,6 +5,10 @@
     {
       "name": "user_name",
       "type": "string"
+    },
+    {
+      "name": "login_time",
+      "type": "long"
     }
   ]
 }

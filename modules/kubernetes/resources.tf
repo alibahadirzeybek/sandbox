@@ -1,6 +1,6 @@
 resource "docker_image" "images" {
     for_each        = fileset(path.root, "${path.module}/images/*/Dockerfile")
-    name            = "local.ververica.registry/v2.12/${reverse(split("/", each.value))[1]}:2.12.0"
+    name            = "local.ververica.registry/v2.12/${reverse(split("/", each.value))[1]}:2.12.1"
     keep_locally    = true
     build {
         context     = substr(each.value, 0, length(each.value) - 11)
