@@ -10,7 +10,7 @@ RUN curl -o /tmp/aws-java-sdk-bundle-1.12.664.jar https://repo1.maven.org/maven2
 
 # ----
 
-FROM registry.ververica.com/v2.12/vvp-gateway:2.12.0
+FROM registry.ververica.com/v2.12/vvp-gateway:2.12.1
 
 COPY catalog-meta.yaml /vvp/sql/opt/catalogs/hive/catalog-meta.yaml
 
