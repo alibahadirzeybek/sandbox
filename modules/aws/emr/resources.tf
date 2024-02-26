@@ -31,8 +31,8 @@ resource "aws_emr_cluster" "vvp" {
 
   provisioner "remote-exec" {
     inline = [
-      "hive -e \"CREATE DATABASE events LOCATION 's3a://${var.bucket_name}/warehouse';\"",
-      "hive -e \"CREATE EXTERNAL TABLE events.login (user_name STRING, login_time BIGINT) ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe' WITH SERDEPROPERTIES ('avro.schema.url' = 's3a://${var.bucket_name}/schema/schema.avsc') STORED AS AVRO;\"",
+      "hive -f 's3a://${var.bucket_name}/scripts/create_database.hql';",
+      "hive -f 's3a://${var.bucket_name}/scripts/create_table.hql';",
     ]
   }
 }

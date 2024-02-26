@@ -1,6 +1,6 @@
 {
   "type": "record",
-  "name": "Events",
+  "name": "LoginEvent",
   "fields": [
     {
       "name": "user_name",
